@@ -1,0 +1,45 @@
+{
+  "name": "event-constructor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "babel.config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config build/webpack.prod.js",
+    "dev": "webpack-dev-server --config build/webpack.dev.js",
+    "dev:test": "webpack-dev-server --config build/webpack.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lemonce3/event-constructor.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lemonce3/event-constructor/issues"
+  },
+  "homepage": "https://github.com/lemonce3/event-constructor#readme",
+  "devDependencies": {
+    "@babel/core": "^7.3.3",
+    "@babel/plugin-transform-member-expression-literals": "^7.2.0",
+    "@babel/plugin-transform-property-literals": "^7.2.0",
+    "@babel/plugin-transform-runtime": "^7.2.0",
+    "@babel/polyfill": "^7.2.5",
+    "@babel/preset-env": "^7.3.1",
+    "babel-loader": "^8.0.5",
+    "css-loader": "^2.1.0",
+    "es6-template-strings": "^2.0.1",
+    "html-webpack-plugin": "^3.2.0",
+    "js-polyfills": "^0.1.42",
+    "mocha": "^5.2.0",
+    "style-loader": "^0.21.0",
+    "uglifyjs-webpack-plugin": "^1.1.1",
+    "webpack": "^4.29.4",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.8",
+    "webpack-merge": "^4.2.1"
+  }
+}
