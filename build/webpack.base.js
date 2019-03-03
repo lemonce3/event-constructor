@@ -6,7 +6,8 @@ global.config = require(path.resolve(process.cwd(), 'config.json'));
 module.exports = {
 	entry: {
 		bundle: [
-			path.resolve('src/index.js'),
+			'core-js',
+			path.resolve('src/index.js')
 		]
 	},
 	output: {
