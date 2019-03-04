@@ -1,6 +1,13 @@
-const {Event, MouseEvent, KeyboardEvent,
-    FocuseEvent, UIEvent, CustomEvent} = require('../src/index');
-
+const {
+    MouseEvent,
+	UIEvent,
+	KeyboardEvent,
+	FocusEvent,
+    Event,
+    InputEvent,
+    CustomEvent
+} = require('../src/index');
+    
 const event = new Event('test', {
     bubbles: false
 }), 
@@ -10,14 +17,18 @@ mouseEvent = new MouseEvent('mousedown', {
 keyBoardEvent = new KeyboardEvent('keydown', {
     altKey: true
 }),
-focuseEvent = new FocuseEvent('focusin', {
+focusEvent = new FocusEvent('focusin', {
     bubbles: false
 }),
 uiEvent = new UIEvent('', {
     bubbles: true
 }),
-customEvent = new CustomEvent('', {
-    detail: '11'
+inputEvent = new InputEvent('', {
+    bubbles: true
+}),
+customEvent = new CustomEvent('custom', {
+    detail: '11',
+    test: '123'
 });
 
-console.log(event, mouseEvent, keyBoardEvent, focuseEvent, uiEvent, customEvent);
+console.log(event, mouseEvent, keyBoardEvent, focusEvent, uiEvent, inputEvent, customEvent);
