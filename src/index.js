@@ -1,5 +1,8 @@
-const {isECS, isIE8} = require('./enviroment');
-const defaultBehavior = require('./default-behavior');
+let isECS = true, hasInput = true;
+try { new MouseEvent('click', {}); } catch (_) { isECS = false;}
+try { InputEvent; } catch (_) { hasInput = false; };
+
+const isIE8 = !document.createEvent && !isECS;
 
 function buildInitEventArgs(type, opts, map) {
     const args = [type];
@@ -14,7 +17,7 @@ function buildInitEventArgs(type, opts, map) {
 	return args;
 }
 
-function createEvent(typeArg, eventInit) {
+function CreateEvent(typeArg, eventInit) {
     const event = document.createEventObject(window.event);
 
     for (let optKey in eventInit) {
@@ -25,94 +28,102 @@ function createEvent(typeArg, eventInit) {
 
     Object.defineProperty(event, 'type', {value: typeArg});
 
-    // 触发事件元素的默认行为
-
     return event;
 }
 
-const $Event = function (typeArg, eventInit) {
-    const event = document.createEvent('Event');
-    
-    event.initEvent.apply(event, buildInitEventArgs(typeArg, eventInit, [
-        'bubbles', 'cancelable'
-    ]));
-
-    return event;
-};
-
-const $MouseEvent = function (typeArg, eventInit) {
-    const event = document.createEvent('MouseEvent');
-
-    event.initEvent.apply(event, buildInitEventArgs(typeArg, eventInit, [
-        'bubbles', 'cancelable', 'view', 'detail', 'screenX', 'screenY', 'clientX',
-        'clientY', 'ctrlKey', 'altKey', 'shiftKey', 'metaKey', 'button', 'relatedTarget'
-    ]));
-
-    return event;
-};
-
-const $UIEvent = function (typeArg, eventInit) {
-    const event = document.createEvent('UIEvent');
-
-    event.initUIEvent.apply(event, buildInitEventArgs(typeArg, eventInit, [
-        'bubbles', 'cancelable', 'view', 'detail'
-    ]));
-
-    return event;
-};
-
-const $KeyboardEvent = function (typeArg, eventInit) {
-    const event = document.createEvent('KeyboardEvent');
+const constructorRegistry = {
+    Event: function (typeArg, eventInit) {
+        const event = document.createEvent('Event');
         
-    event.initKeyboardEvent.apply(event, buildInitEventArgs(typeArg, eventInit, [
-        'bubbles', 'cancelable', 'view', 'char', 'key', 'location', 'modifiers', 'repeat'
-    ]));
-
-    return event;
-};
-
-const $InputEvent = $UIEvent;
-
-const $FocusEvent = function (typeArg, eventInit) {
-    const event = document.createEvent('FocusEvent');
-
-    event.initFocusEvent.apply(event, buildInitEventArgs(typeArg, eventInit, [
-        'bubbles', 'cancelable', 'view', 'detail', 'relatedTarget'
-    ]));
-
-    return event;
-};
-
-const $CustomEvent = function (typeArg, eventInit) {
-    const event = document.createEvent('CustomEvent');
-
-    event.initCustomEvent.apply(event, buildInitEventArgs(typeArg, eventInit, [
-        'bubbles', 'cancelable', 'detail'
-    ]));
-
-    return event;
-};
-
-let constructor = isECS ? {
-    Event, MouseEvent, UIEvent, KeyboardEvent, InputEvent, FocusEvent,
-    CustomEvent
-} : (
-    isIE8 ? {
-        Event: createEvent,
-        UIEvent: createEvent,
-        MouseEvent: createEvent,
-        KeyboardEvent: createEvent,
-        InputEvent: null, FocusEvent: null,
-        CustomEvent: null
-    } : {
-        Event: $Event,
-        UIEvent: $UIEvent,
-        MouseEvent: $MouseEvent,
-        KeyboardEvent: $KeyboardEvent,
-        InputEvent: $InputEvent,
-        FocusEvent: $FocusEvent,
-        CustomEvent: $CustomEvent
+        event.initEvent.apply(event, buildInitEventArgs(typeArg, eventInit, [
+            'bubbles', 'cancelable'
+        ]));
+    
+        return event;
+    },
+    MouseEvent: function (typeArg, eventInit) {
+        const event = document.createEvent('MouseEvent');
+    
+        event.initMouseEvent.apply(event, buildInitEventArgs(typeArg, eventInit, [
+            'bubbles', 'cancelable', 'view', 'detail', 'screenX', 'screenY', 'clientX',
+            'clientY', 'ctrlKey', 'altKey', 'shiftKey', 'metaKey', 'button', 'relatedTarget'
+        ]));
+    
+        return event;
+    },
+    UIEvent: function (typeArg, eventInit) {
+        const event = document.createEvent('UIEvent');
+    
+        event.initUIEvent.apply(event, buildInitEventArgs(typeArg, eventInit, [
+            'bubbles', 'cancelable', 'view', 'detail'
+        ]));
+    
+        return event;
+    },
+    KeyboardEvent: function (typeArg, eventInit) {
+        const event = document.createEvent('KeyboardEvent');
+            
+        event.initKeyboardEvent.apply(event, buildInitEventArgs(typeArg, eventInit, [
+            'bubbles', 'cancelable', 'view', 'char', 'key', 'location', 'modifiers', 'repeat'
+        ]));
+    
+        return event;
+    },
+    FocusEvent: function (typeArg, eventInit) {
+        const event = document.createEvent('FocusEvent');
+    
+        event.initFocusEvent.apply(event, buildInitEventArgs(typeArg, eventInit, [
+            'bubbles', 'cancelable', 'view', 'detail', 'relatedTarget'
+        ]));
+    
+        return event;
     }
-);
+};
 
-module.exports = constructor;
+const constructor = {
+    Event: null,
+    UIEvent: null,
+    MouseEvent: null,
+    KeyboardEvent: null,
+    InputEvent: null, FocusEvent: null
+};
+
+function getEventConstructor() {
+    if (isECS) {
+        for (let key in constructor) {
+            if (constructor.hasOwnProperty(key) && key !== 'InputEvent') {
+                constructor[key] = window[key];
+            }
+        }
+
+        constructor.InputEvent = hasInput ? InputEvent : constructorRegistry.UIEvent;
+
+        return constructor;
+    }
+
+    if (isIE8) {
+        for (let key in constructor) {
+            if (constructor.hasOwnProperty(key) && key !== 'InputEvent') {
+                constructor[key] = CreateEvent;
+            }
+        }
+
+        return constructor;
+    }
+
+    for (let key in constructor) {
+        if (constructor.hasOwnProperty(key) && key !== 'InputEvent') {
+            constructor[key] = constructorRegistry[key];
+        }
+    }
+
+    constructor.InputEvent = constructorRegistry.UIEvent;
+
+    return constructor;
+}
+
+module.exports = getEventConstructor();
+
+// touchEvent 判断环境，一个新的环境，区别于isECS和isIE8
+// wheelEvent 设备兼容性（苹果）
+// scrollEvent 同上

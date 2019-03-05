@@ -9,7 +9,7 @@ const {
 
 const assert = require('assert');
 
-describe('IE9 and above browser testing', function () {
+describe('Chrome latest browser testing', function () {
     describe('Event API test', function () {
         it('Create event normally', function () {
             const event = new Event('test', {
@@ -150,7 +150,7 @@ describe('IE9 and above browser testing', function () {
 
             assert.deepEqual({
                 type: event.type, bubbles: event.bubbles,
-                isUIEvent: event instanceof window.UIEvent,
+                isUIEvent: event instanceof window.InputEvent,
                 test: undefined
             }, {
                 type: 'input', bubbles: true,

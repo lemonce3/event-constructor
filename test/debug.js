@@ -4,8 +4,7 @@ const {
 	KeyboardEvent,
 	FocusEvent,
     Event,
-    InputEvent,
-    CustomEvent
+    InputEvent
 } = require('../src/index');
     
 const event = new Event('test', {
@@ -25,10 +24,6 @@ uiEvent = new UIEvent('', {
 }),
 inputEvent = new InputEvent('', {
     bubbles: true
-}),
-customEvent = new CustomEvent('custom', {
-    detail: '11',
-    test: '123'
 });
 
-console.log(event, mouseEvent, keyBoardEvent, focusEvent, uiEvent, inputEvent, customEvent);
+console.log(event, mouseEvent, keyBoardEvent, focusEvent, uiEvent, inputEvent);

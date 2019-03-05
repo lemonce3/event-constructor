@@ -4,22 +4,21 @@ const {
 	KeyboardEvent,
 	FocusEvent,
     Event,
-    InputEvent,
-    CustomEvent
+    InputEvent
 } = require('../../src');
 const assert = require('assert');
 
 describe('IE8 Browser Testing', function () {
     describe('Event API test', function () {
-        it('Create event retrive with argument', function () {
+        it('Create event normally', function () {
             const event = new Event('test', {
-                bubbles: false
+                cancelBubble: false
             });
 
             assert.deepEqual({
-                type: event.type, bubbles: event.bubbles
+                type: event.type, cancelBubble: event.cancelBubble
             }, {
-                type: 'test', bubbles: false
+                type: 'test', cancelBubble: false
             });
         });
 
@@ -27,74 +26,112 @@ describe('IE8 Browser Testing', function () {
             const event = new Event('test');
 
             assert.deepEqual({
-                type: event.type, bubbles: event.bubbles
+                type: event.type, cancelBubble: event.cancelBubble
             }, {
-                type: 'test', bubbles: false
+                type: 'test', cancelBubble: false
             });
-        });
-
-        it('Create event retrive abnormally', function () {
-            const event = new Event('');
         });
     });
 
     describe('UIEvent API test', function () {
-        it('Create UIEvent retrive with argument', function () {
+        it('Create UIEvent normally', function () {
+            const event = new UIEvent('load', {
+                cancelBubble: true
+            });
 
+            assert.deepEqual({
+                type: event.type, cancelBubble: event.cancelBubble
+            }, {
+                type: 'load', cancelBubble: true
+            });
         });
 
         it('Create UIEvent retrive without argument', function () {
+            const event = new UIEvent('load');
 
-        });
-
-        it('Create UIEvent retrive abnormally', function () {
-
+            assert.deepEqual({
+                type: event.type, cancelBubble: event.cancelBubble
+            }, {
+                type: 'load', cancelBubble: false
+            });
         });
     });
 
     describe('MouseEvent API test', function () {
-        it('Create MouseEvent retrive with argument', function () {
+        it('Create MouseEvent normally', function () {
+            const event = new MouseEvent('mousedown', {
+                cancelBubble: false
+            });
 
+            assert.deepEqual({
+                type: event.type, cancelBubble: event.cancelBubble
+            }, {
+                type: 'mousedown', cancelBubble: false
+            });
         });
 
         it('Create MouseEvent retrive without argument', function () {
+            const event = new MouseEvent('mousedown');
 
-        });
-
-        it('Create MouseEvent retrive abnormally', function () {
-
+            assert.deepEqual({
+                type: event.type, cancelBubble: event.cancelBubble
+            }, {
+                type: 'mousedown', cancelBubble: false
+            });
         });
     });
 
     describe('FocusEvent API test', function () {
-        it('browser can not support API', function () {
+        it('Create FocusEvent normally', function () {
+            const event = new FocusEvent('focusin', {
+                cancelBubble: false
+            });
 
+            assert.deepEqual({
+                type: event.type, cancelBubble: event.cancelBubble
+            }, {
+                type: 'focusin', cancelBubble: false
+            });
+        });
+
+        it('Create FocusEvent retrive without argument', function () {
+            const event = new FocusEvent('focusin');
+
+            assert.deepEqual({
+                type: event.type, cancelBubble: event.cancelBubble
+            }, {
+                type: 'focusin', cancelBubble: false
+            });
         });
     });
 
     describe('KeyboardEvent API test', function () {
-        it('Create CustomEvent retrive with argument', function () {
+        it('Create KeyboardEvent normally', function () {
+            const event = new KeyboardEvent('keypress', {
+                cancelBubble: false
+            });
 
+            assert.deepEqual({
+                type: event.type, cancelBubble: event.cancelBubble
+            }, {
+                type: 'keypress', cancelBubble: false
+            });
         });
 
-        it('Create CustomEvent retrive without argument', function () {
+        it('Create KeyboardEvent retrive without argument', function () {
+            const event = new KeyboardEvent('keypress');
 
-        });
-
-        it('Create CustomEvent retrive abnormally', function () {
-
+            assert.deepEqual({
+                type: event.type, cancelBubble: event.cancelBubble
+            }, {
+                type: 'keypress', cancelBubble: false
+            });
         });
     });
 
     describe('InputEvent API test', function () {
         it('browser can not support API', function () {
-
-        });
-    });
-
-    describe('CustomEvent API test', function () {
-        it('browser can not support API', function () {
-
+            assert.equal(InputEvent, null);
         });
     });
 });
