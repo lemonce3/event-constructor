@@ -18,15 +18,15 @@ function buildInitEventArgs(type, opts, map) {
 }
 
 function CreateEvent(typeArg, eventInit) {
-    const event = document.createEventObject(window.event);
+    const event = document.createEventObject();
 
     for (let optKey in eventInit) {
 		if (eventInit.hasOwnProperty(optKey)) {
-            Object.defineProperty(event, optKey, {value: eventInit[optKey]});
+            event[optKey] = eventInit[optKey]
 		}
     }
 
-    Object.defineProperty(event, 'type', {value: typeArg});
+    event.type = typeArg;
 
     return event;
 }
