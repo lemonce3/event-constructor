@@ -150,7 +150,7 @@ describe('Firefox31 and above browser testing', function () {
 
             assert.deepEqual({
                 type: event.type, bubbles: event.bubbles,
-                isUIEvent: event instanceof window.InputEvent,
+                isUIEvent: event instanceof window.UIEvent,
                 test: undefined
             }, {
                 type: 'input', bubbles: true,

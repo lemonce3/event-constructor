@@ -1,128 +1,133 @@
-let isECS = true, hasInput = true;
-try { new MouseEvent('click', {}); } catch (_) { isECS = false;}
-try { InputEvent; } catch (_) { hasInput = false; };
+const isIE8 = !document.createEvent;
 
-const isIE8 = !document.createEvent && !isECS;
-
-function buildInitEventArgs(type, opts, map) {
-    const args = [type];
-    opts = opts || {};
-    
-	for (let index = 0; index < map.length; index++) {
-        const attribute = map[index];
-
-        args.push(opts[attribute] || null);
-    }
-    
-	return args;
+function forEach(arr, callback) {
+  for (let index = 0; index < arr.length; index++) {
+    callback(arr[index], index);
+  }
 }
 
-function CreateEvent(typeArg, eventInit) {
+function buildInitEventArgs(type, opts = {}, map) {
+  const args = [type];
+  
+  forEach(map, function (item) {
+    args.push(opts[item] || null);
+  });
+    
+  return args;
+}
+
+const UIInit = [
+  'cancelBubble', 'returnValue', 'clientX', 'clientY', 'screenX', 'screenY', 'offsetX', 'offsetY',
+  'x', 'y', 'altKey', 'altleft', 'ctrlKey', 'ctrlLeft', 'shiftKey', 'shiftLeft'
+];
+
+const ie8InitMapping = {
+  Event: [
+    'cancelBubble', 'returnValue'
+  ],
+  UIEvent: UIInit,
+  MouseEvent: UIInit.concat(['button', 'buttonID', 'toElement', 'fromElement']),
+  KeyboardEvent: UIInit.concat(['keyCode']),
+  FocusEvent: UIInit.concat(['toElement', 'fromElement'])
+};
+
+ie8InitMapping.UIEvent.push('dataTransfer', 'contentOverflow');
+
+const ie8 = {};
+ie8.InputEvent = null;
+
+for (let key in ie8InitMapping) {
+  ie8[key] = function (typeArg, eventInit) {
     const event = document.createEventObject();
 
     for (let optKey in eventInit) {
-		if (eventInit.hasOwnProperty(optKey)) {
-            event[optKey] = eventInit[optKey]
-		}
+      let isExist = false;
+
+      forEach(ie8InitMapping[key], function (item) {
+        if (isExist) {
+          return;
+        }
+
+        isExist = item === optKey
+      });
+
+      if (isExist) {
+        event[optKey] = eventInit[optKey];
+      }
     }
 
     event.type = typeArg;
 
     return event;
+  }
 }
 
-const constructorRegistry = {
-    Event: function (typeArg, eventInit) {
-        const event = document.createEvent('Event');
-        
-        event.initEvent.apply(event, buildInitEventArgs(typeArg, eventInit, [
-            'bubbles', 'cancelable'
-        ]));
-    
-        return event;
-    },
-    MouseEvent: function (typeArg, eventInit) {
-        const event = document.createEvent('MouseEvent');
-    
-        event.initMouseEvent.apply(event, buildInitEventArgs(typeArg, eventInit, [
-            'bubbles', 'cancelable', 'view', 'detail', 'screenX', 'screenY', 'clientX',
-            'clientY', 'ctrlKey', 'altKey', 'shiftKey', 'metaKey', 'button', 'relatedTarget'
-        ]));
-    
-        return event;
-    },
-    UIEvent: function (typeArg, eventInit) {
-        const event = document.createEvent('UIEvent');
-    
-        event.initUIEvent.apply(event, buildInitEventArgs(typeArg, eventInit, [
-            'bubbles', 'cancelable', 'view', 'detail'
-        ]));
-    
-        return event;
-    },
-    KeyboardEvent: function (typeArg, eventInit) {
-        const event = document.createEvent('KeyboardEvent');
-            
-        event.initKeyboardEvent.apply(event, buildInitEventArgs(typeArg, eventInit, [
-            'bubbles', 'cancelable', 'view', 'char', 'key', 'location', 'modifiers', 'repeat'
-        ]));
-    
-        return event;
-    },
-    FocusEvent: function (typeArg, eventInit) {
-        const event = document.createEvent('FocusEvent');
-    
-        event.initFocusEvent.apply(event, buildInitEventArgs(typeArg, eventInit, [
-            'bubbles', 'cancelable', 'view', 'detail', 'relatedTarget'
-        ]));
-    
-        return event;
-    }
+const ie9InitMapping = {
+  Event: [
+    'bubbles', 'cancelable'
+  ],
+  UIEvent: [
+    'bubbles', 'cancelable', 'view', 'detail'
+  ],
+  MouseEvent: [
+    'bubbles', 'cancelable', 'view', 'detail', 'screenX', 'screenY', 'clientX',
+    'clientY', 'ctrlKey', 'altKey', 'shiftKey', 'metaKey', 'button', 'relatedTarget'
+  ],
+  FocusEvent: [
+    'bubbles', 'cancelable', 'view', 'detail', 'relatedTarget'
+  ]
 };
 
-const constructor = {
-    Event: null,
-    UIEvent: null,
-    MouseEvent: null,
-    KeyboardEvent: null,
-    InputEvent: null, FocusEvent: null
-};
+const ie9 = {};
 
-function getEventConstructor() {
-    if (isECS) {
-        for (let key in constructor) {
-            if (constructor.hasOwnProperty(key) && key !== 'InputEvent') {
-                constructor[key] = window[key];
-            }
-        }
+for (let key in ie9InitMapping) {
+  ie9[key] = function (typeArg, eventInit) {
+    const event = document.createEvent(key);
 
-        constructor.InputEvent = hasInput ? InputEvent : constructorRegistry.UIEvent;
+    event[`init${key}`].apply(event, buildInitEventArgs(typeArg, eventInit, ie9InitMapping[key]));
 
-        return constructor;
-    }
-
-    if (isIE8) {
-        for (let key in constructor) {
-            if (constructor.hasOwnProperty(key) && key !== 'InputEvent') {
-                constructor[key] = CreateEvent;
-            }
-        }
-
-        return constructor;
-    }
-
-    for (let key in constructor) {
-        if (constructor.hasOwnProperty(key) && key !== 'InputEvent') {
-            constructor[key] = constructorRegistry[key];
-        }
-    }
-
-    constructor.InputEvent = constructorRegistry.UIEvent;
-
-    return constructor;
+    return event;
+  }
 }
 
-module.exports = getEventConstructor();
+const initKey = [
+  'bubbles', 'cancelable', 'view', 'ctrlKey', 'altKey', 'shiftKey', 'metaKey', 'char', 'key'
+];
+const initKeyboard = [
+  'bubbles', 'cancelable', 'view', 'char', 'key', 'location', 'modifiers', 'repeat'
+];
+
+ie9.KeyboardEvent = function (typeArg, eventInit) {
+  const event = document.createEvent('KeyboardEvent');
+
+  if (event.initKeyboardEvent) {
+    event.initKeyboardEvent.apply(event, buildInitEventArgs(typeArg, eventInit, initKeyboard));
+    
+    return event;
+  }
+
+  event.initKeyEvent.apply(event, buildInitEventArgs(typeArg, eventInit, initKey));
+    
+  return event;
+};
+
+ie9.InputEvent = ie9.UIEvent;
+
+const constructor = {};
+
+for (let key in ie9) {
+  if (isIE8) {
+    constructor[key] = ie8[key];
+  } else {
+    let isExist = true;
+    
+    try { new window[key]('test') } catch(_) {isExist = false};
+
+    constructor[key] = isExist ?  window[key] : ie9[key];
+  }
+}
+
+module.exports = constructor;
 
 // touchEvent 判断环境，一个新的环境，区别于isECS和isIE8
 // wheelEvent 设备兼容性（苹果）

@@ -12,7 +12,7 @@ describe('IE8 Browser Testing', function () {
     describe('Event API test', function () {
         it('Create event normally', function () {
             const event = new Event('test', {
-                cancelBubble: false
+                cancelBubble: false, test: '123'
             });
 
             assert.deepEqual({
@@ -60,13 +60,14 @@ describe('IE8 Browser Testing', function () {
     describe('MouseEvent API test', function () {
         it('Create MouseEvent normally', function () {
             const event = new MouseEvent('mousedown', {
-                cancelBubble: false
+                cancelBubble: false, keyCode: 13, button: 1
             });
 
             assert.deepEqual({
-                type: event.type, cancelBubble: event.cancelBubble
+                type: event.type, cancelBubble: event.cancelBubble, keyCode: event.keyCode,
+                button: event.button
             }, {
-                type: 'mousedown', cancelBubble: false
+                type: 'mousedown', cancelBubble: false, keyCode: 0, button: 1
             });
         });
 
@@ -108,13 +109,13 @@ describe('IE8 Browser Testing', function () {
     describe('KeyboardEvent API test', function () {
         it('Create KeyboardEvent normally', function () {
             const event = new KeyboardEvent('keypress', {
-                cancelBubble: false
+                cancelBubble: false, keyCode: 13
             });
 
             assert.deepEqual({
-                type: event.type, cancelBubble: event.cancelBubble
+                type: event.type, cancelBubble: event.cancelBubble, keyCode: event.keyCode
             }, {
-                type: 'keypress', cancelBubble: false
+                type: 'keypress', cancelBubble: false, keyCode: 13
             });
         });
 
