@@ -12,7 +12,7 @@ describe('IE8 Browser Testing', function () {
     describe('Event API test', function () {
         it('Create event normally', function () {
             const event = new Event('test', {
-                cancelBubble: false, test: '123'
+                bubbles: true, test: '123'
             });
 
             assert.deepEqual({
@@ -36,13 +36,14 @@ describe('IE8 Browser Testing', function () {
     describe('UIEvent API test', function () {
         it('Create UIEvent normally', function () {
             const event = new UIEvent('load', {
-                cancelBubble: true
+                bubbles: false, cancelable: false
             });
-
+            console.log(event);
             assert.deepEqual({
-                type: event.type, cancelBubble: event.cancelBubble
+                type: event.type, cancelBubble: event.cancelBubble,
+                returnValue: event.returnValue
             }, {
-                type: 'load', cancelBubble: true
+                type: 'load', cancelBubble: true, returnValue: true
             });
         });
 
