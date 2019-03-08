@@ -1,12 +1,12 @@
 const IE8BaseInit = [
 	'bubbles', 'cancelable', 'clientX', 'clientY', 'screenX', 'screenY',
-	'offsetX', 'offsetY', 'altKey', 'ctrlKey', 'shiftKey', 'shiftLeft', 
+	'offsetX', 'offsetY', 'altKey', 'ctrlKey', 'shiftKey', 'shiftLeft',
 	'ctrlLeft', 'altLeft', 'x', 'y'
 ];
 
 exports.IE8InitMapping = {
 	Event: [
-	  'bubbles', 'cancelable'
+		'bubbles', 'cancelable'
 	],
 	UIEvent: IE8BaseInit,
 	MouseEvent: IE8BaseInit.concat(['button', 'relatedTarget']),
@@ -18,7 +18,7 @@ const NotIE8BaseInit = ['bubbles', 'cancelable', 'view'];
 
 exports.NotIe8InitMapping = {
 	Event: [
-	  'bubbles', 'cancelable'
+		'bubbles', 'cancelable'
 	],
 	UIEvent: NotIE8BaseInit.concat(['detail']),
 	MouseEvent: NotIE8BaseInit.concat([
